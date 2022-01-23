@@ -2,13 +2,18 @@ from datetime import datetime
 from django.shortcuts import render
 from django.template import context
 from django.views.generic.base import(
-  View, TemplateView
+  View, TemplateView, RedirectView
 )
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.generic.edit import (
+    CreateView,UpdateView, DeleteView, 
+    FormView
+)
 from . import forms
 from datetime import datetime
 from .models import Books
+from django.urls import reverse_lazy
 
 # Create your views here.
 
@@ -58,3 +63,60 @@ class BookListView(ListView):
         qs = qs.filter(name__startswith=self.kwargs['name'])
       qs = qs.order_by('description')
       return qs
+
+
+class BookCreateView(CreateView):
+  model = Books
+  fields = ['name', 'description', 'price']
+  template_name = 'add_book.html'
+  success_url = reverse_lazy('store:list_books')
+
+
+  def form_valid(self, form):
+    form.instance.create_at = datetime.now()
+    form.instance.update_at = datetime.now()
+    return super(BookCreateView, self).form_valid(form)
+
+  def get_initial(self, **kwargs):
+      initial = super(BookCreateView, self).get_initial(**kwargs)
+      initial['name'] = 'sample'
+      return initial
+
+class BookUpdateView(UpdateView):
+
+  template_name = 'update_book.html'
+  model = Books
+  form_class = forms.BookUpdateForm
+
+  def get_success_url(self):
+    return reverse_lazy('store:edit_book', kwargs={'pk':self.object.id})
+
+class BookDeleteView(DeleteView):
+  model = Books
+  template_name = 'delete_book.html'
+  success_url = reverse_lazy('store:list_books')
+
+class BookFormView(FormView):
+
+  template_name = 'form_book.html'
+  form_class = forms.BookForm
+  success_url = reverse_lazy('store:list_books')
+
+  def get_initial(self):
+    initial = super(BookFormView, self).get_initial()
+    initial['name'] = 'form sample'
+    return initial
+
+  def form_valid(self, form):
+      if form.is_valid():
+          form.save()
+      return super(BookFormView, self).form_valid(form)
+
+class BookRedirectView(RedirectView):
+  url = 'https://yahoo.co.jp'
+
+  def get_redirect_url(self, *args, **kwargs):
+    book = Books.objects.first()
+    if 'pk' in kwargs:
+      return reverse_lazy('store:detail_book', kwargs={'pk': kwargs['pk']})
+    return reverse_lazy('store:edit_book', kwargs={'pk':book.pk})
