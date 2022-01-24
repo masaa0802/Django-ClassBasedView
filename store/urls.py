@@ -4,6 +4,7 @@ from .views import(
     IndexView, HomeView, BookDetailView,
    BookListView, BookCreateView, BookUpdateView,
    BookDeleteView, BookFormView,BookRedirectView,
+   delete_picture
   )
 # from django.views.generic.base import TemplateView
 from django.views.generic.base import RedirectView
@@ -24,5 +25,6 @@ urlpatterns = [
   path('google/', RedirectView.as_view(url='https://google.co.jp')),
   path('book_redirect_view/', BookRedirectView.as_view(), name='book_redirect_view'),
   path('book_redirect_view/<int:pk>', BookRedirectView.as_view(), name='book_redirect_view'),
+  path('delete_picture/<int:pk>',delete_picture, name='delete_picture' ),
 ]
 
