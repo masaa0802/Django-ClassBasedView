@@ -1,5 +1,6 @@
 from datetime import datetime
 from email import message
+from email.mime import application
 from importlib.metadata import requires
 from urllib.request import Request
 from django.shortcuts import redirect, render, get_object_or_404
@@ -19,6 +20,9 @@ from .models import Books, Pictures
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+import logging
+
+application_logger = logging.getLogger('application-logger')
 
 # Create your views here.
 
@@ -44,6 +48,7 @@ class HomeView(TemplateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
+    application_logger.debug('Home画面を表示します')
     context['name'] = kwargs.get('name')
     context['time'] = datetime.now()
     return context

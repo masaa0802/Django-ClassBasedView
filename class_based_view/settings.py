@@ -124,6 +124,41 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
+LOGGING = {
+    'version':1,
+    'disable_existing_loggers': False,
+    'formatters':{
+        'simple':{
+            'format': '%(asctime)s %(levelname)s [%(pathname)s:%(lineno)s] %(message)s'
+        }
+    },
+    'handlers':{
+        'console_handler':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'timed_file_handler':{
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join('logs', 'application.log'),
+            'when': 'S',
+            'interval': 10,
+            'backupCount': 10,
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+            'delay': True,
+        }
+    },
+    'loggers':{
+        'application-logger':{
+            'handlers':['console_handler','timed_file_handler'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
+    }
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
