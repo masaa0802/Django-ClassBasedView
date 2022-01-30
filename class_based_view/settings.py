@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'class_based_view.middleware.PerformanceMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'class_based_view.middleware.MyMiddleware',
 ]
 
 ROOT_URLCONF = 'class_based_view.urls'
@@ -148,15 +150,47 @@ LOGGING = {
             'formatter': 'simple',
             'encoding': 'utf-8',
             'delay': True,
-        }
+        },
+        'timed_error_handler':{
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join('logs', 'application_error.log'),
+            'when': 'S',
+            'interval': 10,
+            'backupCount': 10,
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+            'delay': True,
+        },
+        'timed_performance_handler':{
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join('logs', 'application_performance.log'),
+            'when': 'S',
+            'interval': 10,
+            'backupCount': 10,
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+            'delay': True,
+        },
     },
     'loggers':{
         'application-logger':{
             'handlers':['console_handler','timed_file_handler'],
             'level': 'DEBUG',
             'propagate': False,
-        }
-    }
+        },
+        'error-logger':{
+            'handlers':['timed_error_handler'],
+            'level':'ERROR',
+            'propagate':False,
+        },
+         'performance-logger':{
+            'handlers':['timed_performance_handler'],
+            'level':'INFO',
+            'propagate':False,
+        },
+    },
 }
 
 # Default primary key field type
